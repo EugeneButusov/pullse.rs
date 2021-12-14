@@ -1,3 +1,27 @@
+use measure::{DataPuller, Registry};
+
 fn main() {
-    println!("Hello, world!");
+    println!("Bootstrapping started...");
+    let mut registry = Registry::new();
+
+    let pullers = get_pullers();
+    for puller in pullers {
+        let pulled_data = puller.pull_data();
+        registry.insert(pulled_data);
+    }
+    // TODO: bootstrap application
+    println!("Bootstrapping completed!");
+
+    println!("{:?}", registry);
+
+    println!("Runloop initiated")
+    // TODO: implement runloop
+}
+
+fn get_pullers() -> Vec<DataPuller> {
+    let mut result = Vec::new();
+
+    result.push(DataPuller::new());
+
+    result
 }
