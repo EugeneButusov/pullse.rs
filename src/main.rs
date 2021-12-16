@@ -7,7 +7,7 @@ fn main() {
     let pullers = get_pullers();
     for puller in pullers {
         let pulled_data = puller.pull_data();
-        registry.insert(pulled_data);
+        registry.insert(&pulled_data);
     }
     // TODO: bootstrap application
     println!("Bootstrapping completed!");
