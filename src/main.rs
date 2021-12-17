@@ -1,4 +1,5 @@
 use std::{thread, time};
+use std::sync::mpsc::channel;
 use measure::{DataPuller, Registry};
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;
@@ -17,12 +18,15 @@ fn main() {
 
     println!("Runloop initiated");
 
+    let (tx, rx) = channel();
     let pull_thread = thread::spawn(|| {
         loop {
             // TODO: perform pull
-            for puller in &pullers {
+            for puller in pullers {
                 let pulled_data = puller.pull_data();
-                registry.insert(&pulled_data);
+                for (key, value) in pulled_data {
+                    tx.send((key, value));
+                }
             }
             thread::sleep(time::Duration::from_millis(PULL_SLEEP_MS));
         }
