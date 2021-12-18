@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use rand::Rng;
 
 #[derive(Debug)]
 pub struct Registry {
@@ -25,9 +24,8 @@ impl DataPuller {
 
     pub fn pull_data(&self) -> HashMap<String, f32> {
         let mut result = HashMap::new();
-        let mut rng = rand::thread_rng();
 
-        result.insert(String::from("MY_AWESOME_METRIC"), rng.gen::<f32>());
+        result.insert(String::from("MY_AWESOME_METRIC"), 0.5);
 
         result
     }
