@@ -11,10 +11,8 @@ impl Registry {
         Registry { raw_data: HashMap::new() }
     }
 
-    pub fn insert(&mut self, update: &HashMap<String, String>) {
-        for (k, v) in update {
-            self.raw_data.insert(k.to_string(), v.to_string());
-        }
+    pub fn insert(&mut self, (key, value): (String, String)) {
+        self.raw_data.insert(key, value);
     }
 }
 
