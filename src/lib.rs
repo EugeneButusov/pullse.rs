@@ -3,7 +3,7 @@ use rand::Rng;
 
 #[derive(Debug)]
 pub struct Registry {
-    raw_data: HashMap<String, String>,
+    raw_data: HashMap<String, f32>,
 }
 
 impl Registry {
@@ -11,7 +11,7 @@ impl Registry {
         Registry { raw_data: HashMap::new() }
     }
 
-    pub fn insert(&mut self, (key, value): (String, String)) {
+    pub fn insert(&mut self, (key, value): (String, f32)) {
         self.raw_data.insert(key, value);
     }
 }
@@ -23,12 +23,11 @@ impl DataPuller {
         DataPuller {}
     }
 
-    pub fn pull_data(&self) -> HashMap<String, String> {
+    pub fn pull_data(&self) -> HashMap<String, f32> {
         let mut result = HashMap::new();
         let mut rng = rand::thread_rng();
 
-        let value = format!("MY AWESOME VALUE: {}", rng.gen::<u8>());
-        result.insert(String::from("MY_AWESOME_METRIC"), value);
+        result.insert(String::from("MY_AWESOME_METRIC"), rng.gen::<f32>());
 
         result
     }
