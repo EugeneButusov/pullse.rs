@@ -33,8 +33,7 @@ fn main() {
         }
     });
 
-    let publish_thread = thread::spawn(move || loop {
-        let entry = rx.recv().unwrap(); // TODO: add proper error handling
+    let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
         registry.insert(entry);
         // TODO: perform real publish instead of println
         println!("{:?}", &registry);
