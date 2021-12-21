@@ -1,6 +1,6 @@
 use std::{thread, time};
 use std::sync::mpsc::channel;
-use measure::{DataPuller, Registry, WeatherDataPuller};
+use measure::{get_pullers, Registry};
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;
 
@@ -41,13 +41,4 @@ fn main() {
 
     pull_thread.join().unwrap();
     publish_thread.join().unwrap();
-}
-
-fn get_pullers() -> Vec<Box<(dyn DataPuller + Send)>> {
-    let mut result = Vec::new();
-
-    let weather_puller = WeatherDataPuller::new(String::from("API_KEY"), String::from("LOCATION"));
-    result.push(Box::new(weather_puller) as Box<(dyn DataPuller + Send)>);
-
-    result
 }
