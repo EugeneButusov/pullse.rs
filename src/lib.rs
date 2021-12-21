@@ -16,7 +16,14 @@ impl Registry {
     }
 }
 
-pub struct DataPuller {}
+pub trait DataPuller {
+    fn pull_data(&self) -> HashMap<String, f32>;
+}
+
+pub struct WeatherDataPuller {
+    api_key: String,
+    location: String,
+}
 
 #[derive(Deserialize, Debug)]
 struct Location {
@@ -46,15 +53,20 @@ struct WeatherData {
     current: WeatherCondition,
 }
 
-impl DataPuller {
-    pub fn new() -> DataPuller {
-        DataPuller {}
+impl WeatherDataPuller {
+    pub fn new(api_key: String, location: String) -> WeatherDataPuller {
+        WeatherDataPuller {
+            api_key, location
+        }
     }
+}
 
-    pub fn pull_data(&self) -> HashMap<String, f32> {
+impl DataPuller for WeatherDataPuller {
+    fn pull_data(&self) -> HashMap<String, f32> {
         let mut result = HashMap::new();
 
-        let resp = reqwest::blocking::get("http://api.weatherapi.com/v1/current.json?key=%%API_KEY%%&q=%%LOCATION%%&aqi=no")
+        let url = format!("http://api.weatherapi.com/v1/current.json?key={}&q={}&aqi=no", self.api_key, self.location);
+        let resp = reqwest::blocking::get(url)
             .unwrap()
             .json::<WeatherData>().unwrap();
 
