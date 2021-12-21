@@ -1,3 +1,4 @@
+use std::env;
 use std::collections::HashMap;
 use serde::Deserialize;
 
@@ -54,9 +55,13 @@ struct WeatherData {
 }
 
 impl WeatherDataPuller {
-    pub fn new(api_key: String, location: String) -> WeatherDataPuller {
+    pub fn new() -> WeatherDataPuller {
+        let api_key = env::var("WEATHER_PULLER_API_KEY").unwrap();
+        let location = env::var("WEATHER_PULLER_LOCATION").unwrap();
+
         WeatherDataPuller {
-            api_key, location
+            api_key,
+            location,
         }
     }
 }
@@ -79,8 +84,7 @@ impl DataPuller for WeatherDataPuller {
 pub fn get_pullers() -> Vec<Box<(dyn DataPuller + Send)>> {
     let mut result = Vec::new();
 
-    let weather_puller = WeatherDataPuller::new(String::from("API_KEY"), String::from("LOCATION"));
-    result.push(Box::new(weather_puller) as Box<(dyn DataPuller + Send)>);
+    result.push(Box::new(WeatherDataPuller::new()) as Box<(dyn DataPuller + Send)>);
 
     result
 }
