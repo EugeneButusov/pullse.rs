@@ -23,13 +23,13 @@ impl PrometheusConsumer {
         PrometheusConsumer { registry, collectors }
     }
 
-    pub fn report(&self) {
+    fn get_report(&self) -> String {
         let mut buffer = vec![];
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();
         encoder.encode(&metric_families, &mut buffer).unwrap();
         let result = String::from_utf8(buffer).unwrap();
-        println!("{}", result);
+        result
     }
 }
 
