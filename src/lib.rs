@@ -1,15 +1,26 @@
 use std::collections::HashMap;
 
 pub mod pulling;
+pub mod consuming;
 
 #[derive(Debug)]
-pub struct Registry {
+pub struct PullseLedger {
     raw_data: HashMap<String, f32>,
 }
 
-impl Registry {
-    pub fn new() -> Registry {
-        Registry { raw_data: HashMap::new() }
+impl PullseLedger {
+    pub fn new() -> PullseLedger {
+        PullseLedger { raw_data: HashMap::new() }
+    }
+
+    pub fn get_metric_names(&self) -> Vec<&String> {
+        let mut result = Vec::new();
+
+        for (key, _) in self.raw_data.iter() {
+            result.push(key);
+        }
+
+        result
     }
 
     pub fn insert(&mut self, (key, value): (String, f32)) {

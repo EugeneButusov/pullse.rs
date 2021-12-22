@@ -2,7 +2,7 @@ use std::env;
 use std::collections::HashMap;
 use serde::Deserialize;
 
-use crate::pulling::common::DataPuller;
+use crate::pulling::common::PullsePuller;
 
 pub struct WeatherDataPuller {
     api_key: String,
@@ -49,7 +49,7 @@ impl WeatherDataPuller {
     }
 }
 
-impl DataPuller for WeatherDataPuller {
+impl PullsePuller for WeatherDataPuller {
     fn pull_data(&self) -> HashMap<String, f32> {
         let mut result = HashMap::new();
 

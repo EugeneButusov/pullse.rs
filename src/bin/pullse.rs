@@ -1,22 +1,25 @@
 use std::{thread, time};
 use std::sync::mpsc::channel;
-use pullse::{Registry};
+use pullse::{PullseLedger};
 use pullse::pulling::common::get_pullers;
+use pullse::consuming::common::get_consumers;
 
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;
 
 fn main() {
     println!("Bootstrapping started...");
-    let mut registry = Registry::new();
+    let mut ledger = PullseLedger::new();
 
     let pullers = get_pullers();
     for puller in &pullers {
         let pulled_data = puller.pull_data();
         for entry in pulled_data {
-            registry.insert(entry);
+            ledger.insert(entry);
         }
     }
+
+    let consumers = get_consumers(&ledger);
     println!("Bootstrapping completed!");
 
     println!("Runloop initiated");
@@ -36,9 +39,10 @@ fn main() {
     });
 
     let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
-        registry.insert(entry);
-        // TODO: perform real publish instead of println
-        println!("{:?}", &registry);
+        ledger.insert(entry);
+        for consumer in &consumers {
+            consumer.consume(&ledger);
+        }
     });
 
     pull_thread.join().unwrap();
