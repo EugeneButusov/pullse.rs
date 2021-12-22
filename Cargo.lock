@@ -358,15 +358,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
 
 [[package]]
-name = "measure"
-version = "0.1.0"
-dependencies = [
- "prometheus",
- "reqwest",
- "serde",
-]
-
-[[package]]
 name = "memchr"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -560,6 +551,15 @@ name = "protobuf"
 version = "2.25.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47c327e191621a2158159df97cdbc2e7074bb4e940275e35abf38eb3d2595754"
+
+[[package]]
+name = "pullse"
+version = "0.1.0"
+dependencies = [
+ "prometheus",
+ "reqwest",
+ "serde",
+]
 
 [[package]]
 name = "quote"

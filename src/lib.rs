@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-mod pulling;
+pub mod pulling;
 
 #[derive(Debug)]
 pub struct Registry {

@@ -1,7 +1,7 @@
 use std::{thread, time};
 use std::sync::mpsc::channel;
-use measure::{Registry};
-
+use pullse::{Registry};
+use pullse::pulling::common::get_pullers;
 
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;
