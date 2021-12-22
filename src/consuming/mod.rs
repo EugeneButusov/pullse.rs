@@ -1,5 +1,5 @@
 // general traits, structs, etc
-mod common;
+pub mod common;
 
 // concrete implementations
-mod prometheus_consumer;
+pub mod prometheus_consumer;

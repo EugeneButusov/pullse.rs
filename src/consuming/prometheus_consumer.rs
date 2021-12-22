@@ -1,4 +1,4 @@
-use prometheus::{Registry, Gauge, Opts};
+use prometheus::{Registry, Gauge, Opts, TextEncoder, Encoder};
 use crate::consuming::common::PullseConsumer;
 use crate::PullseLedger;
 
@@ -7,7 +7,7 @@ pub struct PrometheusConsumer {
 }
 
 impl PrometheusConsumer {
-    fn new(ledger: &PullseLedger) -> PrometheusConsumer {
+    pub fn new(ledger: &PullseLedger) -> PrometheusConsumer {
         let registry = Registry::new();
 
         for metric_name in ledger.get_metric_names() {
@@ -22,6 +22,11 @@ impl PrometheusConsumer {
 
 impl PullseConsumer for PrometheusConsumer {
     fn consume(&self, ledger: &PullseLedger) {
-        todo!("consume data")
+        let mut buffer = vec![];
+        let encoder = TextEncoder::new();
+        let metric_families = self.registry.gather();
+        encoder.encode(&metric_families, &mut buffer).unwrap();
+        let result = String::from_utf8(buffer).unwrap();
+        println!("{}", result);
     }
 }
