@@ -1,7 +1,6 @@
 use std::env;
 use std::collections::HashMap;
 use serde::Deserialize;
-
 use crate::pulling::common::DataPuller;
 
 pub struct WeatherDataPuller {

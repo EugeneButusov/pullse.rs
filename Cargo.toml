@@ -9,3 +9,4 @@ edition = "2021"
 prometheus = "0.13.0"
 reqwest = { version = "0.11.7", features = ["blocking", "json"] }
 serde = { version = "1.0.132", features = ["derive"] }
+binance = { git = "https://github.com/wisespace-io/binance-rs.git" }
