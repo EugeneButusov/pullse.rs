@@ -1,11 +1,14 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 use prometheus::{Registry, Gauge, Opts, TextEncoder, Encoder};
+use warp::Filter;
+use tokio::runtime::Runtime;
 use crate::consuming::common::PullseConsumer;
 use crate::PullseLedger;
 
 pub struct PrometheusConsumer {
-    registry: Registry,
     collectors: HashMap<String, Gauge>,
+    tokio_runtime: Option<Runtime>,
 }
 
 impl PrometheusConsumer {
@@ -20,15 +23,31 @@ impl PrometheusConsumer {
             registry.register(Box::new(gauge.clone())).unwrap();
             collectors.insert(String::from(metric_name), gauge);
         }
-        PrometheusConsumer { registry, collectors }
-    }
 
-    fn get_report(&self) -> String {
-        let mut buffer = vec![];
-        let encoder = TextEncoder::new();
-        let metric_families = self.registry.gather();
-        encoder.encode(&metric_families, &mut buffer).unwrap();
-        let result = String::from_utf8(buffer).unwrap();
+        let registry = Arc::new(registry);
+
+        let mut result = PrometheusConsumer {
+            collectors,
+            tokio_runtime: None,
+        };
+
+        let gathering_registry = Arc::clone(&registry);
+        let metrics_taker = warp::path("metrics").map(move || {
+            let mut buffer = vec![];
+            let encoder = TextEncoder::new();
+            let metric_families = gathering_registry.gather();
+            encoder.encode(&metric_families, &mut buffer).unwrap();
+            let result = String::from_utf8(buffer).unwrap();
+            result
+        });
+
+        let rt = Runtime::new()
+            .unwrap();
+
+        rt.spawn(warp::serve(metrics_taker).run(([127, 0, 0, 1], 3030)));
+
+        result.tokio_runtime = Some(rt);
+
         result
     }
 }
