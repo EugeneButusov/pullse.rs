@@ -1,8 +1,8 @@
 use std::{thread, time};
 use std::sync::mpsc::channel;
-use pullse::{PullseLedger};
-use pullse::gathering::common::get_gatherers;
-use pullse::exposing::common::get_exposers;
+use pullse::ledger::{PullseLedger};
+use pullse::gathering::get_gatherers;
+use pullse::exposing::get_exposers;
 
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;

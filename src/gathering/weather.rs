@@ -2,7 +2,7 @@ use std::env;
 use std::collections::HashMap;
 use serde::Deserialize;
 
-use crate::gathering::common::PullseGatherer;
+use super::common::PullseGatherer;
 
 pub struct WeatherDataGatherer {
     api_key: String,

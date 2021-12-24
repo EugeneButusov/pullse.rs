@@ -3,8 +3,8 @@ use std::sync::Arc;
 use prometheus::{Registry, Gauge, Opts, TextEncoder, Encoder};
 use warp::Filter;
 use tokio::runtime::Runtime;
-use crate::exposing::common::PullseExposer;
-use crate::PullseLedger;
+use super::common::PullseExposer;
+use super::PullseLedger;
 
 pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
@@ -56,7 +56,7 @@ impl PullseExposer for PrometheusExposer {
     fn consume(&self, ledger: &PullseLedger) {
         for metric_name in ledger.get_metric_names() {
             if let Some(collector) = self.collectors.get(metric_name) {
-                if let Some(value) = ledger.raw_data.get(metric_name) {
+                if let Some(value) = ledger.get_metric(metric_name) {
                     collector.set(value.clone().into());
                 }
             }
