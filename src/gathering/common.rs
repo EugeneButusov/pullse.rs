@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::gathering::weather::WeatherDataGatherer;
 
 pub trait PullseGatherer {
-    fn pull_data(&self) -> HashMap<String, f32>;
+    fn gather(&self) -> HashMap<String, f64>;
 }
 
 pub fn get_gatherers() -> Vec<Box<(dyn PullseGatherer + Send)>> {

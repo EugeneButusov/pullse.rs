@@ -13,7 +13,7 @@ fn main() {
 
     let pullers = get_gatherers();
     for puller in &pullers {
-        let pulled_data = puller.pull_data();
+        let pulled_data = puller.gather();
         for entry in pulled_data {
             ledger.insert(entry);
         }
@@ -29,7 +29,7 @@ fn main() {
         loop {
             // TODO: perform pull
             for puller in &pullers {
-                let pulled_data = puller.pull_data();
+                let pulled_data = puller.gather();
                 for entry in pulled_data {
                     tx.send(entry).unwrap(); // TODO: add proper error handling
                 }

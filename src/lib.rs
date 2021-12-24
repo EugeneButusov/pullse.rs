@@ -5,7 +5,7 @@ pub mod exposing;
 
 #[derive(Debug)]
 pub struct PullseLedger {
-    raw_data: HashMap<String, f32>,
+    raw_data: HashMap<String, f64>,
 }
 
 impl PullseLedger {
@@ -23,7 +23,7 @@ impl PullseLedger {
         result
     }
 
-    pub fn insert(&mut self, (key, value): (String, f32)) {
+    pub fn insert(&mut self, (key, value): (String, f64)) {
         self.raw_data.insert(key, value);
     }
 }

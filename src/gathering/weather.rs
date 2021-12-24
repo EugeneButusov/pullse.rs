@@ -50,7 +50,7 @@ impl WeatherDataGatherer {
 }
 
 impl PullseGatherer for WeatherDataGatherer {
-    fn pull_data(&self) -> HashMap<String, f32> {
+    fn gather(&self) -> HashMap<String, f64> {
         let mut result = HashMap::new();
 
         let url = format!("http://api.weatherapi.com/v1/current.json?key={}&q={}&aqi=no", self.api_key, self.location);
@@ -58,7 +58,7 @@ impl PullseGatherer for WeatherDataGatherer {
             .unwrap()
             .json::<WeatherData>().unwrap();
 
-        result.insert(String::from("LOCAL_TEMPERATURE"), resp.current.temp_c);
+        result.insert(String::from("LOCAL_TEMPERATURE"), resp.current.temp_c.into());
 
         result
     }
