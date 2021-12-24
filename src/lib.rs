@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 pub mod gathering;
-pub mod consuming;
+pub mod exposing;
 
 #[derive(Debug)]
 pub struct PullseLedger {

@@ -2,4 +2,4 @@
 pub mod common;
 
 // concrete implementations
-pub mod prometheus_consumer;
+pub mod prometheus;

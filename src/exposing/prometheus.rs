@@ -3,16 +3,16 @@ use std::sync::Arc;
 use prometheus::{Registry, Gauge, Opts, TextEncoder, Encoder};
 use warp::Filter;
 use tokio::runtime::Runtime;
-use crate::consuming::common::PullseConsumer;
+use crate::exposing::common::PullseExposer;
 use crate::PullseLedger;
 
-pub struct PrometheusConsumer {
+pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
     tokio_runtime: Option<Runtime>,
 }
 
-impl PrometheusConsumer {
-    pub fn new(ledger: &PullseLedger) -> PrometheusConsumer {
+impl PrometheusExposer {
+    pub fn new(ledger: &PullseLedger) -> PrometheusExposer {
         let registry = Registry::new();
         let mut collectors = HashMap::new();
 
@@ -26,7 +26,7 @@ impl PrometheusConsumer {
 
         let registry = Arc::new(registry);
 
-        let mut result = PrometheusConsumer {
+        let mut result = PrometheusExposer {
             collectors,
             tokio_runtime: None,
         };
@@ -52,7 +52,7 @@ impl PrometheusConsumer {
     }
 }
 
-impl PullseConsumer for PrometheusConsumer {
+impl PullseExposer for PrometheusExposer {
     fn consume(&self, ledger: &PullseLedger) {
         for metric_name in ledger.get_metric_names() {
             if let Some(collector) = self.collectors.get(metric_name) {

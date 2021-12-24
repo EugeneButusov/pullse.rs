@@ -2,7 +2,7 @@ use std::{thread, time};
 use std::sync::mpsc::channel;
 use pullse::{PullseLedger};
 use pullse::gathering::common::get_pullers;
-use pullse::consuming::common::get_consumers;
+use pullse::exposing::common::get_consumers;
 
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;
