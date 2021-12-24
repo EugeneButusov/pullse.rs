@@ -2,9 +2,9 @@ use std::env;
 use std::collections::HashMap;
 use serde::Deserialize;
 
-use crate::pulling::common::PullsePuller;
+use crate::gathering::common::PullseGatherer;
 
-pub struct WeatherDataPuller {
+pub struct WeatherDataGatherer {
     api_key: String,
     location: String,
 }
@@ -37,19 +37,19 @@ struct WeatherData {
     current: WeatherCondition,
 }
 
-impl WeatherDataPuller {
-    pub fn new() -> WeatherDataPuller {
-        let api_key = env::var("WEATHER_PULLER_API_KEY").unwrap();
-        let location = env::var("WEATHER_PULLER_LOCATION").unwrap();
+impl WeatherDataGatherer {
+    pub fn new() -> WeatherDataGatherer {
+        let api_key = env::var("WEATHER_GATHERER_API_KEY").unwrap();
+        let location = env::var("WEATHER_GATHERER_LOCATION").unwrap();
 
-        WeatherDataPuller {
+        WeatherDataGatherer {
             api_key,
             location,
         }
     }
 }
 
-impl PullsePuller for WeatherDataPuller {
+impl PullseGatherer for WeatherDataGatherer {
     fn pull_data(&self) -> HashMap<String, f32> {
         let mut result = HashMap::new();
 

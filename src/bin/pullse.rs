@@ -1,7 +1,7 @@
 use std::{thread, time};
 use std::sync::mpsc::channel;
 use pullse::{PullseLedger};
-use pullse::pulling::common::get_pullers;
+use pullse::gathering::common::get_pullers;
 use pullse::consuming::common::get_consumers;
 
 

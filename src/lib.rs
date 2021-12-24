@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub mod pulling;
+pub mod gathering;
 pub mod consuming;
 
 #[derive(Debug)]
