@@ -1,8 +1,8 @@
 use std::{thread, time};
 use std::sync::mpsc::channel;
 use pullse::{PullseLedger};
-use pullse::gathering::common::get_pullers;
-use pullse::exposing::common::get_consumers;
+use pullse::gathering::common::get_gatherers;
+use pullse::exposing::common::get_exposers;
 
 
 const PULL_SLEEP_MS: u64 = 5 * 1000;
@@ -11,7 +11,7 @@ fn main() {
     println!("Bootstrapping started...");
     let mut ledger = PullseLedger::new();
 
-    let pullers = get_pullers();
+    let pullers = get_gatherers();
     for puller in &pullers {
         let pulled_data = puller.pull_data();
         for entry in pulled_data {
@@ -19,7 +19,7 @@ fn main() {
         }
     }
 
-    let consumers = get_consumers(&ledger);
+    let consumers = get_exposers(&ledger);
     println!("Bootstrapping completed!");
 
     println!("Runloop initiated");
