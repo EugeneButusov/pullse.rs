@@ -44,7 +44,7 @@ impl PrometheusExposer {
         let rt = Runtime::new()
             .unwrap();
 
-        rt.spawn(warp::serve(metrics_taker).run(([127, 0, 0, 1], 3030)));
+        rt.spawn(warp::serve(metrics_taker).run(([0, 0, 0, 0], 3030)));
 
         result.tokio_runtime = Some(rt);
 
