@@ -1,0 +1,8 @@
+[gatherers]
+    [gatherers.weather]
+    api_key = ""
+    location = "123"
+
+[exposers]
+    [exposers.prometheus]
+    port = 3000
