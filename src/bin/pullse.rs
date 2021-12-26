@@ -6,7 +6,7 @@ use pullse::exposing::get_exposers;
 use pullse::settings::Settings;
 
 fn main() {
-    let settings = Settings::new().unwrap();
+    let settings = Settings::new().expect("Config cannot be read as it's corrupted");
     println!("{:?}", settings);
 
     println!("Bootstrapping started...");
