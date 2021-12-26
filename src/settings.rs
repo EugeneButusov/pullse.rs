@@ -1,7 +1,5 @@
 use std::collections::HashMap;
-use std::env;
-use std::hash::Hash;
-use config::{ConfigError, Config, File, Environment};
+use config::{ConfigError, Config, File};
 
 #[derive(Debug, Deserialize)]
 pub struct CommonSettings {
@@ -26,7 +24,15 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn new(custom_config_path: String) -> Result<Self, ConfigError> {
+    pub fn new_default() -> Result<Self, ConfigError> {
+        let mut s = Config::default();
+
+        s.merge(File::with_name("config/default"))?;
+
+        s.try_into()
+    }
+
+    pub fn new_from_custom_config(custom_config_path: String) -> Result<Self, ConfigError> {
         let mut s = Config::default();
 
         s.merge(File::with_name("config/default"))?;

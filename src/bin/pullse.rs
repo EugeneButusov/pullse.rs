@@ -1,4 +1,4 @@
-use std::{thread, time};
+use std::{env, thread, time};
 use std::sync::mpsc::channel;
 use pullse::ledger::{PullseLedger};
 use pullse::gathering::get_gatherers;
@@ -6,8 +6,11 @@ use pullse::exposing::get_exposers;
 use pullse::settings::Settings;
 
 fn main() {
-    let settings = Settings::new(String::from("../custom"))
-        .expect("Config cannot be read as it's corrupted");
+    let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
+        Settings::new_from_custom_config(custom_config_path)
+    } else {
+        Settings::new_default()
+    }.expect("Config cannot be read as it's corrupted");
 
     println!("Bootstrapping started...");
     let mut ledger = PullseLedger::new();
