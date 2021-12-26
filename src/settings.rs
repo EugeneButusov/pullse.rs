@@ -1,29 +1,52 @@
+use std::collections::HashMap;
 use std::env;
+use std::hash::Hash;
 use config::{ConfigError, Config, File, Environment};
-use serde::Deserializer;
 
+#[derive(Debug, Deserialize)]
+pub struct CommonSettings {
+    pub pull_timeout: u64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GathererSettings {
+    pub enabled: bool,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ExposerSettings {
+    pub enabled: bool,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Settings {
-
+    pub common: CommonSettings,
+    pub gatherers: HashMap<String, GathererSettings>,
+    pub exposers: HashMap<String, ExposerSettings>,
 }
 
 impl Settings {
-    pub fn new(source_path: String) -> Result<Config, ConfigError> {
-        let mut config = Config::default();
+    pub fn new() -> Result<Self, ConfigError> {
+        let mut s = Config::default();
 
         // Start off by merging in the "default" configuration file
-        config.merge(File::with_name("config/default"))?;
+        s.merge(File::with_name("config/default"))?;
 
-        // Add in a custom configuration file
-        config.merge(File::with_name(source_path.as_str()).required(false))?;
+        // Add in the current environment file
+        // Default to 'development' env
+        // Note that this file is _optional_
+        // let env = env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
+        // s.merge(File::with_name(&format!("config/{}", env)).required(false))?;
 
-        // Now that we're done, let's access our configuration
-        if let Ok(t) = config.get_table("gatherers.weather") {
-            if let Some(val) = t.get("location") {
-                println!("{:?}", val.kind);
-            }
-        }
+        // Add in a local configuration file
+        // This file shouldn't be checked in to git
+        // s.merge(File::with_name("config/local").required(false))?;
+
+        // Add in settings from the environment (with a prefix of APP)
+        // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
+        // s.merge(Environment::with_prefix("app"))?;
 
         // You can deserialize (and thus freeze) the entire configuration as
-        Ok(config)
+        s.try_into()
     }
 }

@@ -9,7 +9,7 @@ use pullse::settings::Settings;
 const PULL_SLEEP_MS: u64 = 5 * 1000;
 
 fn main() {
-    let settings = Settings::new(String::from(""));
+    let settings = Settings::new().unwrap();
     println!("{:?}", settings);
 
     println!("Bootstrapping started...");
@@ -38,7 +38,7 @@ fn main() {
                     tx.send(entry).unwrap(); // TODO: add proper error handling
                 }
             }
-            thread::sleep(time::Duration::from_millis(PULL_SLEEP_MS));
+            thread::sleep(time::Duration::from_millis(settings.common.pull_timeout));
         }
     });
 

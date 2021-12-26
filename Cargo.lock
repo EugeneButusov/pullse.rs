@@ -773,6 +773,7 @@ dependencies = [
  "prometheus",
  "reqwest",
  "serde 1.0.132",
+ "serde_derive",
  "tokio",
  "warp",
 ]
