@@ -6,8 +6,8 @@ use pullse::exposing::get_exposers;
 use pullse::settings::Settings;
 
 fn main() {
-    let settings = Settings::new().expect("Config cannot be read as it's corrupted");
-    println!("{:?}", settings);
+    let settings = Settings::new(String::from("../custom"))
+        .expect("Config cannot be read as it's corrupted");
 
     println!("Bootstrapping started...");
     let mut ledger = PullseLedger::new();
