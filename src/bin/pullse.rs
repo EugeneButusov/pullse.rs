@@ -5,9 +5,6 @@ use pullse::gathering::get_gatherers;
 use pullse::exposing::get_exposers;
 use pullse::settings::Settings;
 
-
-const PULL_SLEEP_MS: u64 = 5 * 1000;
-
 fn main() {
     let settings = Settings::new().unwrap();
     println!("{:?}", settings);
