@@ -770,6 +770,7 @@ name = "pullse"
 version = "0.1.0"
 dependencies = [
  "config",
+ "log",
  "prometheus",
  "reqwest",
  "serde 1.0.132",
