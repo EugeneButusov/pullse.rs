@@ -1,18 +1,22 @@
 use std::{env, thread, time};
 use std::sync::mpsc::channel;
+use log::{info};
+use simple_logger::SimpleLogger;
 use pullse::ledger::{PullseLedger};
 use pullse::gathering::get_gatherers;
 use pullse::exposing::get_exposers;
 use pullse::settings::Settings;
 
 fn main() {
+    SimpleLogger::new().init().unwrap();
+
     let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
         Settings::new_from_custom_config(custom_config_path)
     } else {
         Settings::new_default()
     }.expect("Config cannot be read as it's corrupted");
 
-    println!("Bootstrapping started...");
+    info!("Bootstrapping started...");
     let mut ledger = PullseLedger::new();
 
     let pullers = get_gatherers(&settings.gatherers);
@@ -24,9 +28,9 @@ fn main() {
     }
 
     let consumers = get_exposers(&ledger, &settings.exposers);
-    println!("Bootstrapping completed!");
+    info!("Bootstrapping completed!");
 
-    println!("Runloop initiated");
+    info!("Runloop initiated");
 
     let (tx, rx) = channel();
     let pull_thread = thread::spawn(move || {
