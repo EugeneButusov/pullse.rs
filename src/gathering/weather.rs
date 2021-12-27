@@ -1,5 +1,5 @@
-use std::env;
 use std::collections::HashMap;
+use config::Value;
 use serde::Deserialize;
 
 use super::common::PullseGatherer;
@@ -38,9 +38,21 @@ struct WeatherData {
 }
 
 impl WeatherDataGatherer {
-    pub fn new() -> WeatherDataGatherer {
-        let api_key = env::var("WEATHER_GATHERER_API_KEY").unwrap();
-        let location = env::var("WEATHER_GATHERER_LOCATION").unwrap();
+    pub fn new(settings: &HashMap<String, Value>) -> WeatherDataGatherer {
+        // TODO: think about .unwrap().clone() is good chaining
+        let api_key: String = settings.get("api_key").unwrap().clone().try_into()
+            .expect("WeatherDataGatherer::new -> `api_key` should be a string.");
+        let location: String = settings.get("location").unwrap().clone().try_into()
+            .expect("WeatherDataGatherer::new -> `location` should be a string.");
+
+        // TODO: may be better to use Result Error instead of panicking
+        if api_key.chars().count() == 0 {
+            panic!("WeatherDataGatherer::new -> api_key cannot be empty.");
+        }
+
+        if location.chars().count() == 0 {
+            panic!("WeatherDataGatherer::new -> location cannot be empty.");
+        }
 
         WeatherDataGatherer {
             api_key,

@@ -1,17 +1,21 @@
-use std::{thread, time};
+use std::{env, thread, time};
 use std::sync::mpsc::channel;
 use pullse::ledger::{PullseLedger};
 use pullse::gathering::get_gatherers;
 use pullse::exposing::get_exposers;
-
-
-const PULL_SLEEP_MS: u64 = 5 * 1000;
+use pullse::settings::Settings;
 
 fn main() {
+    let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
+        Settings::new_from_custom_config(custom_config_path)
+    } else {
+        Settings::new_default()
+    }.expect("Config cannot be read as it's corrupted");
+
     println!("Bootstrapping started...");
     let mut ledger = PullseLedger::new();
 
-    let pullers = get_gatherers();
+    let pullers = get_gatherers(&settings.gatherers);
     for puller in &pullers {
         let pulled_data = puller.gather();
         for entry in pulled_data {
@@ -19,7 +23,7 @@ fn main() {
         }
     }
 
-    let consumers = get_exposers(&ledger);
+    let consumers = get_exposers(&ledger, &settings.exposers);
     println!("Bootstrapping completed!");
 
     println!("Runloop initiated");
@@ -34,7 +38,7 @@ fn main() {
                     tx.send(entry).unwrap(); // TODO: add proper error handling
                 }
             }
-            thread::sleep(time::Duration::from_millis(PULL_SLEEP_MS));
+            thread::sleep(time::Duration::from_millis(settings.common.pull_timeout));
         }
     });
 

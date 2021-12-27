@@ -1,0 +1,12 @@
+[common]
+pull_timeout = 5000
+
+[gatherers]
+    [gatherers.weather]
+    enabled = true
+    options = { api_key = "no_value", location = "no_value" }
+
+[exposers]
+    [exposers.prometheus]
+    enabled = true
+    options = { port = 3000 }
