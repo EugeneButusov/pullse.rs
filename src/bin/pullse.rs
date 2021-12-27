@@ -23,7 +23,7 @@ fn main() {
         }
     }
 
-    let consumers = get_exposers(&ledger);
+    let consumers = get_exposers(&ledger, &settings.exposers);
     println!("Bootstrapping completed!");
 
     println!("Runloop initiated");
