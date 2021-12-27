@@ -1,26 +1,25 @@
 use std::collections::HashMap;
-use config::{ConfigError, Config, File};
+use config::{ConfigError, Config, File, Value};
 
 #[derive(Debug, Deserialize)]
 pub struct CommonSettings {
     pub pull_timeout: u64,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct GathererSettings {
-    pub enabled: bool,
-}
+pub type ExposerKey = String;
+pub type GathererKey = String;
 
 #[derive(Debug, Deserialize)]
-pub struct ExposerSettings {
+pub struct AgentSettings {
     pub enabled: bool,
+    pub options: HashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub common: CommonSettings,
-    pub gatherers: HashMap<String, GathererSettings>,
-    pub exposers: HashMap<String, ExposerSettings>,
+    pub gatherers: HashMap<GathererKey, AgentSettings>,
+    pub exposers: HashMap<ExposerKey, AgentSettings>,
 }
 
 impl Settings {

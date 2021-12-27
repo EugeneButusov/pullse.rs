@@ -15,7 +15,7 @@ fn main() {
     println!("Bootstrapping started...");
     let mut ledger = PullseLedger::new();
 
-    let pullers = get_gatherers();
+    let pullers = get_gatherers(&settings.gatherers);
     for puller in &pullers {
         let pulled_data = puller.gather();
         for entry in pulled_data {

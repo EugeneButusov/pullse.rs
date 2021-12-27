@@ -4,7 +4,7 @@ pull_timeout = 5000
 [gatherers]
     [gatherers.weather]
     enabled = true
-    options = { api_key = "", location = "" }
+    options = { api_key = "123", location = "456" }
 
 [exposers]
     [exposers.prometheus]
