@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use config::{ConfigError, Config, File, Value};
 
+const DEFAULT_CONFIG_PATH: &str = "/usr/local/share/pullse/config/default";
+
 #[derive(Debug, Deserialize)]
 pub struct CommonSettings {
     pub pull_timeout: u64,
@@ -26,7 +28,7 @@ impl Settings {
     pub fn new_default() -> Result<Self, ConfigError> {
         let mut s = Config::default();
 
-        s.merge(File::with_name("config/default"))?;
+        s.merge(File::with_name(DEFAULT_CONFIG_PATH))?;
 
         s.try_into()
     }
@@ -34,8 +36,8 @@ impl Settings {
     pub fn new_from_custom_config(custom_config_path: String) -> Result<Self, ConfigError> {
         let mut s = Config::default();
 
-        s.merge(File::with_name("config/default"))?;
-        s.merge(File::with_name(custom_config_path.as_str()).required(false))?;
+        s.merge(File::with_name(DEFAULT_CONFIG_PATH).required(false))?;
+        s.merge(File::with_name(custom_config_path.as_str()))?;
 
         s.try_into()
     }
