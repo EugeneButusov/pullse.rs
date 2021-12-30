@@ -1,6 +1,6 @@
 use std::{env, thread, time};
 use std::sync::mpsc::channel;
-use log::{debug, info, LevelFilter};
+use log::{debug, info};
 use simple_logger::SimpleLogger;
 use pullse::ledger::{PullseLedger};
 use pullse::gathering::get_gatherers;
@@ -8,7 +8,7 @@ use pullse::exposing::get_exposers;
 use pullse::settings::Settings;
 
 fn main() {
-    SimpleLogger::new().with_utc_timestamps().with_level(LevelFilter::Info).init().unwrap();
+    SimpleLogger::new().with_utc_timestamps().env().init().unwrap();
     info!("Bootstrapping started...");
 
     let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
