@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter, Result};
 
 pub struct PullseLedger {
     raw_data: HashMap<String, f64>,
@@ -25,5 +26,11 @@ impl PullseLedger {
 
     pub fn get_metric(&self, key: &String) -> Option<&f64> {
         self.raw_data.get(key)
+    }
+}
+
+impl Display for PullseLedger {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{:?}", self.raw_data)
     }
 }
