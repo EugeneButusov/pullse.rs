@@ -10,30 +10,12 @@ pub struct WeatherDataGatherer {
 }
 
 #[derive(Deserialize, Debug)]
-struct Location {
-    name: String,
-    region: String,
-    country: String,
-    lat: f32,
-    lon: f32,
-    tz_id: String,
-    localtime_epoch: u64,
-    localtime: String,
-}
-
-#[derive(Deserialize, Debug)]
 struct WeatherCondition {
-    last_updated_epoch: u64,
-    last_updated: String,
     temp_c: f32,
-    condition: HashMap<String, String>,
-    wind_kph: f32,
-    uv: f32,
 }
 
 #[derive(Deserialize, Debug)]
 struct WeatherData {
-    location: Location,
     current: WeatherCondition,
 }
 
