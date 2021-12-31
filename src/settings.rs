@@ -1,5 +1,5 @@
+use config::{Config, ConfigError, File, Value};
 use std::collections::HashMap;
-use config::{ConfigError, Config, File, Value};
 
 const DEFAULT_CONFIG_PATH: &str = "/usr/local/share/pullse/config/default";
 

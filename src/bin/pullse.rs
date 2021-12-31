@@ -1,21 +1,26 @@
-use std::{env, thread, time};
-use std::sync::mpsc::channel;
 use log::{debug, info};
-use simple_logger::SimpleLogger;
-use pullse::ledger::{PullseLedger};
-use pullse::gathering::get_gatherers;
 use pullse::exposing::get_exposers;
+use pullse::gathering::get_gatherers;
+use pullse::ledger::PullseLedger;
 use pullse::settings::Settings;
+use simple_logger::SimpleLogger;
+use std::sync::mpsc::channel;
+use std::{env, thread, time};
 
 fn main() {
-    SimpleLogger::new().with_utc_timestamps().env().init().unwrap();
+    SimpleLogger::new()
+        .with_utc_timestamps()
+        .env()
+        .init()
+        .unwrap();
     info!("Bootstrapping started...");
 
     let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
         Settings::new_from_custom_config(custom_config_path)
     } else {
         Settings::new_default()
-    }.expect("Config cannot be read as it's corrupted");
+    }
+    .expect("Config cannot be read as it's corrupted");
     debug!("Config has been built");
 
     let mut ledger = PullseLedger::new();
@@ -48,14 +53,16 @@ fn main() {
         }
     });
 
-    let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
-        info!("Received metric {} = {}", entry.0, entry.1);
-        ledger.insert(entry);
-        for consumer in &consumers {
-            consumer.consume(&ledger);
+    let publish_thread = thread::spawn(move || {
+        while let Ok(entry) = rx.recv() {
+            info!("Received metric {} = {}", entry.0, entry.1);
+            ledger.insert(entry);
+            for consumer in &consumers {
+                consumer.consume(&ledger);
+            }
+            info!("Runloop: publish completed");
+            debug!("Ledger content {}", &ledger);
         }
-        info!("Runloop: publish completed");
-        debug!("Ledger content {}", &ledger);
     });
 
     info!("Runloop started");

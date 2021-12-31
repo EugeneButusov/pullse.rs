@@ -1,11 +1,11 @@
-use std::collections::HashMap;
-use std::sync::Arc;
-use config::Value;
-use prometheus::{Registry, Gauge, Opts, TextEncoder, Encoder};
-use warp::Filter;
-use tokio::runtime::Runtime;
 use super::common::PullseExposer;
 use super::PullseLedger;
+use config::Value;
+use prometheus::{Encoder, Gauge, Opts, Registry, TextEncoder};
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::runtime::Runtime;
+use warp::Filter;
 
 pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
@@ -15,7 +15,11 @@ pub struct PrometheusExposer {
 impl PrometheusExposer {
     pub fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> PrometheusExposer {
         // TODO: think about .unwrap().clone() is good chaining
-        let port:u16 = settings.get("port").unwrap().clone().try_into()
+        let port: u16 = settings
+            .get("port")
+            .unwrap()
+            .clone()
+            .try_into()
             .expect("PrometheusExposer::new -> `port` should be a number.");
 
         let registry = Registry::new();
@@ -43,12 +47,10 @@ impl PrometheusExposer {
             let encoder = TextEncoder::new();
             let metric_families = gathering_registry.gather();
             encoder.encode(&metric_families, &mut buffer).unwrap();
-            let result = String::from_utf8(buffer).unwrap();
-            result
+            String::from_utf8(buffer).unwrap()
         });
 
-        let rt = Runtime::new()
-            .unwrap();
+        let rt = Runtime::new().unwrap();
 
         rt.spawn(warp::serve(metrics_taker).run(([0, 0, 0, 0], port)));
 
@@ -63,7 +65,7 @@ impl PullseExposer for PrometheusExposer {
         for metric_name in ledger.get_metric_names() {
             if let Some(collector) = self.collectors.get(metric_name) {
                 if let Some(value) = ledger.get_metric(metric_name) {
-                    collector.set(value.clone().into());
+                    collector.set(*value);
                 }
             }
         }
