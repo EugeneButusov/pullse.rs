@@ -86,7 +86,6 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          components: build
 
       - name: Run cargo build
         uses: actions-rs/cargo@v1
