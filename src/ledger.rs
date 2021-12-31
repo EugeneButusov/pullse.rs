@@ -7,7 +7,9 @@ pub struct PullseLedger {
 
 impl PullseLedger {
     pub fn new() -> PullseLedger {
-        PullseLedger { raw_data: HashMap::new() }
+        PullseLedger {
+            raw_data: HashMap::new(),
+        }
     }
 
     pub fn get_metric_names(&self) -> Vec<&String> {
@@ -24,8 +26,14 @@ impl PullseLedger {
         self.raw_data.insert(key, value);
     }
 
-    pub fn get_metric(&self, key: &String) -> Option<&f64> {
+    pub fn get_metric(&self, key: &str) -> Option<&f64> {
         self.raw_data.get(key)
+    }
+}
+
+impl Default for PullseLedger {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
