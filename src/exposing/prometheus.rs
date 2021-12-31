@@ -47,8 +47,7 @@ impl PrometheusExposer {
             let encoder = TextEncoder::new();
             let metric_families = gathering_registry.gather();
             encoder.encode(&metric_families, &mut buffer).unwrap();
-            let result = String::from_utf8(buffer).unwrap();
-            result
+            String::from_utf8(buffer).unwrap()
         });
 
         let rt = Runtime::new().unwrap();
@@ -66,7 +65,7 @@ impl PullseExposer for PrometheusExposer {
         for metric_name in ledger.get_metric_names() {
             if let Some(collector) = self.collectors.get(metric_name) {
                 if let Some(value) = ledger.get_metric(metric_name) {
-                    collector.set(value.clone().into());
+                    collector.set(*value);
                 }
             }
         }
