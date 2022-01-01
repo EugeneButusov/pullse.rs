@@ -17,6 +17,8 @@ pub struct App {
 
 impl App {
     pub fn new(settings: Settings) -> App {
+        let settings = Box::new(settings);
+
         info!("Bootstrapping started...");
 
         let mut ledger = Box::new(PullseLedger::new());
@@ -33,7 +35,7 @@ impl App {
         info!("Bootstrap completed");
         debug!("Ledger initial content {}", &ledger);
 
-        App{ settings: Box::new(settings), ledger, exposers, gatherers }
+        App{ settings, ledger, exposers, gatherers }
     }
 
     pub fn run(&'static mut self) {
