@@ -47,18 +47,17 @@ impl App {
     fn run(&'static mut self) {
         info!("Starting runloop...");
         let (tx, rx) = channel();
-        let pull_thread = thread::spawn(move || {
-            loop {
-                info!("Runloop: pull is in progress...");
-                for gatherer in &self.gatherers {
-                    let gathered_data = gatherer.gather();
-                    for entry in gathered_data {
-                        tx.send(entry).unwrap(); // TODO: add proper error handling
-                    }
+        let gatherers = &self.gatherers;
+        let pull_thread = thread::spawn(move || loop {
+            info!("Runloop: pull is in progress...");
+            for gatherer in gatherers {
+                let gathered_data = gatherer.gather();
+                for entry in gathered_data {
+                    tx.send(entry).unwrap(); // TODO: add proper error handling
                 }
-                info!("Runloop: pull completed");
-                thread::sleep(time::Duration::from_millis(self.settings.common.pull_timeout));
             }
+            info!("Runloop: pull completed");
+            thread::sleep(time::Duration::from_millis(self.settings.common.pull_timeout));
         });
 
         let mut ledger = &self.ledger;
