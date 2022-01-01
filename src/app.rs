@@ -56,7 +56,7 @@ impl App {
             thread::sleep(time::Duration::from_millis(pull_timeout));
         });
 
-        let ledger_mutex = Mutex::new(&self.ledger);
+        let ledger_mutex = Mutex::new(&mut self.ledger);
         let exposers = &self.exposers;
         let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
             info!("Received metric {} = {}", entry.0, entry.1);

@@ -1,12 +1,7 @@
-use log::{debug, info};
-use pullse::exposing::get_exposers;
-use pullse::gathering::get_gatherers;
-use pullse::ledger::PullseLedger;
 use pullse::settings::Settings;
 use pullse::app::App;
 use simple_logger::SimpleLogger;
-use std::sync::mpsc::channel;
-use std::{env, thread, time};
+use std::{env};
 
 fn main() {
     SimpleLogger::new()
@@ -21,5 +16,6 @@ fn main() {
         Settings::new_default()
     }.expect("Config cannot be read as it's corrupted");
 
-    App::new(settings).run();
+    let mut app = App::new(settings);
+    app.run();
 }
