@@ -1,4 +1,4 @@
-use std::{env, thread, time};
+use std::{thread, time};
 use std::sync::{Mutex};
 use std::sync::mpsc::channel;
 use log::{debug, error, info};
@@ -16,15 +16,8 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> App {
+    pub fn new(settings: Settings) -> App {
         info!("Bootstrapping started...");
-
-        let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
-            Settings::new_from_custom_config(custom_config_path)
-        } else {
-            Settings::new_default()
-        }.expect("Config cannot be read as it's corrupted");
-        debug!("Config has been built");
 
         let mut ledger = Box::new(PullseLedger::new());
 
