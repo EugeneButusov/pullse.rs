@@ -11,7 +11,7 @@ use crate::settings::Settings;
 struct App {
     settings: Box<Settings>,
     ledger: Box<PullseLedger>,
-    gatherers: Vec<Box<(dyn gathering::common::PullseGatherer + Send)>>,
+    gatherers: Vec<Box<dyn gathering::common::PullseGatherer + Send + Sync>>,
     exposers: Vec<Box<(dyn exposing::common::PullseExposer + Send)>>,
 }
 
@@ -44,7 +44,7 @@ impl App {
         App{ settings: Box::new(settings), ledger, exposers, gatherers }
     }
 
-    fn run(&'static mut self) {
+    fn run(&mut self) {
         info!("Starting runloop...");
         let (tx, rx) = channel();
         let gatherers = &self.gatherers;

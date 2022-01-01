@@ -19,7 +19,7 @@ pub fn get_exposers(
             result.push(Box::new(prometheus::PrometheusExposer::new(
                 ledger,
                 &prometheus_settings.options,
-            )) as Box<(dyn common::PullseExposer + Send)>);
+            )) as Box<dyn common::PullseExposer + Send>);
         }
     }
 
