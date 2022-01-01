@@ -1,13 +1,14 @@
 use std::{env, thread, time};
+use std::sync::{Mutex};
 use std::sync::mpsc::channel;
-use log::{debug, info};
+use log::{debug, error, info};
 use crate::{exposing, gathering};
 use crate::exposing::get_exposers;
 use crate::gathering::get_gatherers;
 use crate::ledger::PullseLedger;
 use crate::settings::Settings;
 
-struct App {
+pub struct App {
     settings: Box<Settings>,
     ledger: Box<PullseLedger>,
     gatherers: Vec<Box<dyn gathering::common::PullseGatherer + Send + Sync>>,
@@ -15,7 +16,7 @@ struct App {
 }
 
 impl App {
-    fn new() -> App {
+    pub fn new() -> App {
         info!("Bootstrapping started...");
 
         let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
@@ -42,10 +43,12 @@ impl App {
         App{ settings: Box::new(settings), ledger, exposers, gatherers }
     }
 
-    fn run(&mut self) {
+    pub fn run(&'static mut self) {
         info!("Starting runloop...");
         let (tx, rx) = channel();
+
         let gatherers = &self.gatherers;
+        let pull_timeout = self.settings.common.pull_timeout;
         let pull_thread = thread::spawn(move || loop {
             info!("Runloop: pull is in progress...");
             for gatherer in gatherers {
@@ -55,19 +58,23 @@ impl App {
                 }
             }
             info!("Runloop: pull completed");
-            thread::sleep(time::Duration::from_millis(self.settings.common.pull_timeout));
+            thread::sleep(time::Duration::from_millis(pull_timeout));
         });
 
-        let mut ledger = &self.ledger;
+        let ledger_mutex = Mutex::new(&self.ledger);
         let exposers = &self.exposers;
         let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
             info!("Received metric {} = {}", entry.0, entry.1);
-            ledger.insert(entry);
-            for exposer in exposers {
-                exposer.consume(ledger);
+            if let Ok(mut ledger) = ledger_mutex.lock() {
+                ledger.insert(entry);
+                for exposer in exposers {
+                    exposer.consume(&ledger);
+                }
+                info!("Runloop: publish completed");
+                debug!("Ledger content {}", &ledger);
+            } else {
+                error!("Cannot lock ledger");
             }
-            info!("Runloop: publish completed");
-            debug!("Ledger content {}", ledger);
         });
 
         info!("Runloop started");
