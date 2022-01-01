@@ -12,7 +12,7 @@ struct App {
     settings: Box<Settings>,
     ledger: Box<PullseLedger>,
     gatherers: Vec<Box<dyn gathering::common::PullseGatherer + Send + Sync>>,
-    exposers: Vec<Box<(dyn exposing::common::PullseExposer + Send)>>,
+    exposers: Vec<Box<dyn exposing::common::PullseExposer + Send + Sync>>,
 }
 
 impl App {

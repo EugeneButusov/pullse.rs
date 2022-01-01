@@ -1,6 +1,5 @@
 use crate::settings::{AgentSettings, GathererKey};
 use std::collections::HashMap;
-use std::fmt::Display;
 
 // general traits, structs, etc
 pub mod common;

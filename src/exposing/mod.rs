@@ -11,7 +11,7 @@ pub mod prometheus;
 pub fn get_exposers(
     ledger: &PullseLedger,
     settings: &HashMap<ExposerKey, AgentSettings>,
-) -> Vec<Box<(dyn common::PullseExposer + Send)>> {
+) -> Vec<Box<dyn common::PullseExposer + Send + Sync>> {
     let mut result = Vec::new();
 
     if let Some(prometheus_settings) = settings.get("prometheus") {
@@ -19,7 +19,7 @@ pub fn get_exposers(
             result.push(Box::new(prometheus::PrometheusExposer::new(
                 ledger,
                 &prometheus_settings.options,
-            )) as Box<dyn common::PullseExposer + Send>);
+            )) as Box<dyn common::PullseExposer + Send + Sync>);
         }
     }
 
