@@ -1,7 +1,6 @@
 use std::{env, thread, time};
 use std::sync::mpsc::channel;
 use log::{debug, info};
-use simple_logger::SimpleLogger;
 use crate::{exposing, gathering};
 use crate::exposing::get_exposers;
 use crate::gathering::get_gatherers;
@@ -17,7 +16,6 @@ struct App {
 
 impl App {
     fn new() -> App {
-        SimpleLogger::new().with_utc_timestamps().env().init().unwrap();
         info!("Bootstrapping started...");
 
         let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
