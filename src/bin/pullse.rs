@@ -1,7 +1,7 @@
+use std::{env};
+use simple_logger::SimpleLogger;
 use pullse::settings::Settings;
 use pullse::app::App;
-use simple_logger::SimpleLogger;
-use std::{env};
 
 fn main() {
     SimpleLogger::new()
@@ -16,6 +16,6 @@ fn main() {
         Settings::new_default()
     }.expect("Config cannot be read as it's corrupted");
 
-    let mut app = App::new(settings);
+    let app = App::new(settings);
     app.run();
 }

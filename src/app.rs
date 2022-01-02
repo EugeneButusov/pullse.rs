@@ -38,15 +38,15 @@ impl App {
         App{ settings, ledger, exposers, gatherers }
     }
 
-    pub fn run(&'static mut self) {
+    pub fn run(self) {
         info!("Starting runloop...");
         let (tx, rx) = channel();
 
-        let gatherers = &self.gatherers;
+        let gatherers = self.gatherers;
         let pull_timeout = self.settings.common.pull_timeout;
         let pull_thread = thread::spawn(move || loop {
             info!("Runloop: pull is in progress...");
-            for gatherer in gatherers {
+            for gatherer in &gatherers {
                 let gathered_data = gatherer.gather();
                 for entry in gathered_data {
                     tx.send(entry).unwrap(); // TODO: add proper error handling
@@ -56,13 +56,13 @@ impl App {
             thread::sleep(time::Duration::from_millis(pull_timeout));
         });
 
-        let ledger_mutex = Mutex::new(&mut self.ledger);
-        let exposers = &self.exposers;
+        let ledger_mutex = Mutex::new(self.ledger);
+        let exposers = self.exposers;
         let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
             info!("Received metric {} = {}", entry.0, entry.1);
             if let Ok(mut ledger) = ledger_mutex.lock() {
                 ledger.insert(entry);
-                for exposer in exposers {
+                for exposer in &exposers {
                     exposer.consume(&ledger);
                 }
                 info!("Runloop: publish completed");
