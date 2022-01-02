@@ -3,7 +3,6 @@ use super::PullseLedger;
 use config::Value;
 use prometheus::{Encoder, Gauge, Opts, Registry, TextEncoder};
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::runtime::Runtime;
 use warp::Filter;
 
@@ -32,13 +31,10 @@ impl PrometheusExposer {
             collectors.insert(String::from(metric_name), gauge);
         }
 
-        let registry = Arc::new(registry);
-
-        let gathering_registry = Arc::clone(&registry);
         let metrics_taker = warp::path("metrics").map(move || {
             let mut buffer = vec![];
             let encoder = TextEncoder::new();
-            let metric_families = gathering_registry.gather();
+            let metric_families = registry.gather();
             encoder.encode(&metric_families, &mut buffer).unwrap();
             String::from_utf8(buffer).unwrap()
         });
