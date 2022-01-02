@@ -1,7 +1,6 @@
 use std::{thread, time};
-use std::sync::{Mutex};
 use std::sync::mpsc::channel;
-use log::{debug, error, info};
+use log::{debug, info};
 use crate::{exposing, gathering};
 use crate::exposing::get_exposers;
 use crate::gathering::get_gatherers;
@@ -56,20 +55,16 @@ impl App {
             thread::sleep(time::Duration::from_millis(pull_timeout));
         });
 
-        let ledger_mutex = Mutex::new(self.ledger);
+        let mut ledger = self.ledger;
         let exposers = self.exposers;
         let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
             info!("Received metric {} = {}", entry.0, entry.1);
-            if let Ok(mut ledger) = ledger_mutex.lock() {
-                ledger.insert(entry);
-                for exposer in &exposers {
-                    exposer.consume(&ledger);
-                }
-                info!("Runloop: publish completed");
-                debug!("Ledger content {}", &ledger);
-            } else {
-                error!("Cannot lock ledger");
+            ledger.insert(entry);
+            for exposer in &exposers {
+                exposer.consume(&ledger);
             }
+            info!("Runloop: publish completed");
+            debug!("Ledger content {}", &ledger);
         });
 
         info!("Runloop started");
