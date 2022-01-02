@@ -9,7 +9,6 @@ use warp::Filter;
 
 pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
-    tokio_runtime: Option<Runtime>,
 }
 
 impl PrometheusExposer {
@@ -35,12 +34,6 @@ impl PrometheusExposer {
 
         let registry = Arc::new(registry);
 
-        // TODO: these twists around tokio runtime do not look fine, need to avoid approaches mixin
-        let mut result = PrometheusExposer {
-            collectors,
-            tokio_runtime: None,
-        };
-
         let gathering_registry = Arc::clone(&registry);
         let metrics_taker = warp::path("metrics").map(move || {
             let mut buffer = vec![];
@@ -54,9 +47,7 @@ impl PrometheusExposer {
 
         rt.spawn(warp::serve(metrics_taker).run(([0, 0, 0, 0], port)));
 
-        result.tokio_runtime = Some(rt);
-
-        result
+        PrometheusExposer { collectors }
     }
 }
 
