@@ -1,11 +1,11 @@
-use std::{thread, time};
-use std::sync::mpsc::channel;
-use log::{debug, info};
-use crate::{exposing, gathering};
 use crate::exposing::get_exposers;
 use crate::gathering::get_gatherers;
 use crate::ledger::PullseLedger;
 use crate::settings::Settings;
+use crate::{exposing, gathering};
+use log::{debug, info};
+use std::sync::mpsc::channel;
+use std::{thread, time};
 
 pub struct App {
     settings: Box<Settings>,
@@ -34,7 +34,12 @@ impl App {
         info!("Bootstrap completed");
         debug!("Ledger initial content {}", &ledger);
 
-        App{ settings, ledger, exposers, gatherers }
+        App {
+            settings,
+            ledger,
+            exposers,
+            gatherers,
+        }
     }
 
     pub fn run(self) {
@@ -57,14 +62,16 @@ impl App {
 
         let mut ledger = self.ledger;
         let exposers = self.exposers;
-        let publish_thread = thread::spawn(move || while let Ok(entry) = rx.recv() {
-            info!("Received metric {} = {}", entry.0, entry.1);
-            ledger.insert(entry);
-            for exposer in &exposers {
-                exposer.consume(&ledger);
+        let publish_thread = thread::spawn(move || {
+            while let Ok(entry) = rx.recv() {
+                info!("Received metric {} = {}", entry.0, entry.1);
+                ledger.insert(entry);
+                for exposer in &exposers {
+                    exposer.consume(&ledger);
+                }
+                info!("Runloop: publish completed");
+                debug!("Ledger content {}", &ledger);
             }
-            info!("Runloop: publish completed");
-            debug!("Ledger content {}", &ledger);
         });
 
         info!("Runloop started");
