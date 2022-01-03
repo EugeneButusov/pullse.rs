@@ -27,7 +27,10 @@ impl PullseExposer for PrometheusExposer {
 
         for metric_name in ledger.get_metric_names() {
             let gauge_opts = Opts::new(metric_name, metric_name);
-            let gauge = Gauge::with_opts(gauge_opts).unwrap();
+            let gauge = match Gauge::with_opts(gauge_opts) {
+                Ok(val) => val,
+                Err(_) => return Err(ExposerInitError::Other(format!("Unable to create gauge {}", metric_name))),
+            };
 
             registry.register(Box::new(gauge.clone())).unwrap();
             collectors.insert(String::from(metric_name), gauge);
