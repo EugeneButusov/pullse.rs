@@ -1,8 +1,7 @@
 use config::Value;
 use serde::Deserialize;
 use std::collections::HashMap;
-
-use super::common::PullseGatherer;
+use super::common::{PullseGatherer, GathererInitError};
 
 static LOCAL_TEMPERATURE_KEY: &str = "LOCAL_TEMPERATURE";
 
@@ -22,8 +21,7 @@ struct WeatherData {
 }
 
 impl PullseGatherer for WeatherDataGatherer {
-    // TODO: implement error type for result
-    fn new(settings: &HashMap<String, Value>) -> Result<Self, ()> {
+    fn new(settings: &HashMap<String, Value>) -> Result<Self, GathererInitError> {
         let api_key: String = settings
             .get("api_key")
             .expect("WeatherDataGatherer::new -> `api_key` is not defined")

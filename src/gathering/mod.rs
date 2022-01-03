@@ -17,9 +17,9 @@ pub fn get_gatherers(
     if let Some(weather_settings) = settings.get("weather") {
         if weather_settings.enabled {
             match weather::WeatherDataGatherer::new(&weather_settings.options) {
-                Ok(weatherGatherer) => {
+                Ok(weather_gatherer) => {
                     result.push(
-                        Box::new(weatherGatherer) as Box<dyn common::PullseGatherer + Sync + Send>,
+                        Box::new(weather_gatherer) as Box<dyn common::PullseGatherer + Sync + Send>,
                     );
                 }
                 Err(error) => {

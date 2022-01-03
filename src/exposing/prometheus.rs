@@ -1,24 +1,26 @@
-use super::common::PullseExposer;
-use super::PullseLedger;
+use std::collections::HashMap;
 use config::Value;
 use prometheus::{Encoder, Gauge, Opts, Registry, TextEncoder};
-use std::collections::HashMap;
 use tokio::runtime::Runtime;
 use warp::Filter;
+use super::common::{PullseExposer, ExposerInitError};
+use super::PullseLedger;
 
 pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
 }
 
 impl PullseExposer for PrometheusExposer {
-    // TODO: implement error type for result
-    fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> Result<Self, ()> {
-        let port: u16 = settings
-            .get("port")
-            .expect("PrometheusExposer::new -> `port` is not defined")
-            .clone()
-            .try_into()
-            .expect("PrometheusExposer::new -> `port` should be a number");
+    fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> Result<Self, ExposerInitError> {
+        let port: u16 = match settings.get("port") {
+            Some(val) => {
+                match val.clone().try_into() {
+                    Ok(val) => val,
+                    Err(_) => return Err(ExposerInitError::SettingBadType(String::from("port"), String::from(std::any::type_name::<u16>()))),
+                }
+            },
+            None => return Err(ExposerInitError::SettingUndefined(String::from("port"))),
+        };
 
         let registry = Registry::new();
         let mut collectors = HashMap::new();
@@ -39,7 +41,10 @@ impl PullseExposer for PrometheusExposer {
             String::from_utf8(buffer).unwrap()
         });
 
-        let rt = Runtime::new().expect("Unable to instantiate tokio runtime");
+        let rt = match Runtime::new() {
+            Ok(val) => val,
+            Err(error) => return Err(ExposerInitError::Other(String::from(format!("Unable to instantiate tokio runtime: {}", error))))
+        };
 
         rt.spawn(warp::serve(metrics_taker).run(([0, 0, 0, 0], port)));
 

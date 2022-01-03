@@ -19,8 +19,8 @@ pub fn get_exposers(
     if let Some(prometheus_settings) = settings.get("prometheus") {
         if prometheus_settings.enabled {
             match prometheus::PrometheusExposer::new(ledger, &prometheus_settings.options) {
-                Ok(prometheusExposer) => {
-                    result.push(Box::new(prometheusExposer) as Box<dyn common::PullseExposer + Send + Sync>);
+                Ok(prometheus_exposer) => {
+                    result.push(Box::new(prometheus_exposer) as Box<dyn common::PullseExposer + Send + Sync>);
                 }
                 Err(error) => {
                     error!("Unable to instantiate WeatherDataGatherer: {}", error);
