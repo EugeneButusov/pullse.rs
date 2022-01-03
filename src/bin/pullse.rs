@@ -5,7 +5,10 @@ use std::env;
 
 fn main() {
     if let Err(error) = SimpleLogger::new().with_utc_timestamps().env().init() {
-        println!("Unable to properly setup logger, logs will be incomplete: {}", error);
+        println!(
+            "Unable to properly setup logger, logs will be incomplete: {}",
+            error
+        );
     }
 
     let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
