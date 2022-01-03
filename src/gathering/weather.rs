@@ -1,5 +1,6 @@
 use super::common::{GathererInitError, PullseGatherer};
 use config::Value;
+use log::error;
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -74,15 +75,26 @@ impl PullseGatherer for WeatherDataGatherer {
             "http://api.weatherapi.com/v1/current.json?key={}&q={}&aqi=no",
             self.api_key, self.location
         );
-        let resp = reqwest::blocking::get(url)
-            .unwrap()
-            .json::<WeatherData>()
-            .unwrap();
+        let weather_data: Option<WeatherData> = match reqwest::blocking::get(url) {
+            Ok(response) => match response.json::<WeatherData>() {
+                Ok(data) => Some(data),
+                Err(parse_error) => {
+                    error!("Error occurred parsing weather data: {}", parse_error);
+                    None
+                }
+            },
+            Err(reqwest_error) => {
+                error!("Error occurred during http request: {}", reqwest_error);
+                None
+            }
+        };
 
-        result.insert(
-            String::from(LOCAL_TEMPERATURE_KEY),
-            resp.current.temp_c.into(),
-        );
+        if let Some(weather_data) = weather_data {
+            result.insert(
+                String::from(LOCAL_TEMPERATURE_KEY),
+                weather_data.current.temp_c.into(),
+            );
+        }
 
         result
     }
