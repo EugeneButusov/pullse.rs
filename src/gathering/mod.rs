@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use log::error;
-use common::PullseGatherer;
 use crate::settings::{AgentSettings, GathererKey};
+use common::PullseGatherer;
+use log::error;
+use std::collections::HashMap;
 
 // general traits, structs, etc
 pub mod common;
@@ -18,9 +18,9 @@ pub fn get_gatherers(
         if weather_settings.enabled {
             match weather::WeatherDataGatherer::new(&weather_settings.options) {
                 Ok(weather_gatherer) => {
-                    result.push(
-                        Box::new(weather_gatherer) as Box<dyn common::PullseGatherer + Sync + Send>,
-                    );
+                    result
+                        .push(Box::new(weather_gatherer)
+                            as Box<dyn common::PullseGatherer + Sync + Send>);
                 }
                 Err(error) => {
                     error!("Unable to instantiate WeatherDataGatherer: {}", error);

@@ -1,8 +1,8 @@
-use log::error;
-use std::collections::HashMap;
-use common::PullseExposer;
 use super::ledger::*;
 use crate::settings::{AgentSettings, ExposerKey};
+use common::PullseExposer;
+use log::error;
+use std::collections::HashMap;
 
 // general traits, structs, etc
 pub mod common;
@@ -20,7 +20,8 @@ pub fn get_exposers(
         if prometheus_settings.enabled {
             match prometheus::PrometheusExposer::new(ledger, &prometheus_settings.options) {
                 Ok(prometheus_exposer) => {
-                    result.push(Box::new(prometheus_exposer) as Box<dyn common::PullseExposer + Send + Sync>);
+                    result.push(Box::new(prometheus_exposer)
+                        as Box<dyn common::PullseExposer + Send + Sync>);
                 }
                 Err(error) => {
                     error!("Unable to instantiate WeatherDataGatherer: {}", error);

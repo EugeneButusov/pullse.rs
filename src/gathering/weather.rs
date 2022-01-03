@@ -1,7 +1,7 @@
+use super::common::{GathererInitError, PullseGatherer};
 use config::Value;
 use serde::Deserialize;
 use std::collections::HashMap;
-use super::common::{PullseGatherer, GathererInitError};
 
 static LOCAL_TEMPERATURE_KEY: &str = "LOCAL_TEMPERATURE";
 
@@ -23,31 +23,45 @@ struct WeatherData {
 impl PullseGatherer for WeatherDataGatherer {
     fn new(settings: &HashMap<String, Value>) -> Result<Self, GathererInitError> {
         let api_key: String = match settings.get("api_key") {
-            Some(val) => {
-                match val.clone().try_into() {
-                    Ok(val) => val,
-                    Err(_) => return Err(GathererInitError::SettingBadType(String::from("api_key"), String::from(std::any::type_name::<String>()))),
+            Some(val) => match val.clone().try_into() {
+                Ok(val) => val,
+                Err(_) => {
+                    return Err(GathererInitError::SettingBadType(
+                        String::from("api_key"),
+                        String::from(std::any::type_name::<String>()),
+                    ))
                 }
             },
             None => return Err(GathererInitError::SettingUndefined(String::from("api_key"))),
         };
 
         let location: String = match settings.get("location") {
-            Some(val) => {
-                match val.clone().try_into() {
-                    Ok(val) => val,
-                    Err(_) => return Err(GathererInitError::SettingBadType(String::from("location"), String::from(std::any::type_name::<String>()))),
+            Some(val) => match val.clone().try_into() {
+                Ok(val) => val,
+                Err(_) => {
+                    return Err(GathererInitError::SettingBadType(
+                        String::from("location"),
+                        String::from(std::any::type_name::<String>()),
+                    ))
                 }
             },
-            None => return Err(GathererInitError::SettingUndefined(String::from("location"))),
+            None => {
+                return Err(GathererInitError::SettingUndefined(String::from(
+                    "location",
+                )))
+            }
         };
 
         if api_key.chars().count() == 0 {
-            return Err(GathererInitError::Other(String::from("api_key cannot be empty")));
+            return Err(GathererInitError::Other(String::from(
+                "api_key cannot be empty",
+            )));
         }
 
         if location.chars().count() == 0 {
-            return Err(GathererInitError::Other(String::from("location cannot be empty")));
+            return Err(GathererInitError::Other(String::from(
+                "location cannot be empty",
+            )));
         }
 
         Ok(WeatherDataGatherer { api_key, location })
