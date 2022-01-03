@@ -72,10 +72,10 @@ impl PullseExposer for PrometheusExposer {
         let rt = match Runtime::new() {
             Ok(val) => val,
             Err(error) => {
-                return Err(ExposerInitError::Other(String::from(format!(
+                return Err(ExposerInitError::Other(format!(
                     "Unable to instantiate tokio runtime: {}",
                     error
-                ))))
+                )))
             }
         };
 
