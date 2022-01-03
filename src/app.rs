@@ -15,7 +15,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(settings: Settings) -> App {
+    pub fn new(settings: Settings) -> Self {
         let settings = Box::new(settings);
 
         info!("Bootstrapping started...");
@@ -48,35 +48,36 @@ impl App {
 
         let gatherers = self.gatherers;
         let pull_timeout = self.settings.common.pull_timeout;
-        let pull_thread = thread::spawn(move || loop {
-            info!("Runloop: pull is in progress...");
+        let gathering_thread = thread::spawn(move || loop {
+            info!("Runloop: gathering cycle is in progress...");
             for gatherer in &gatherers {
                 let gathered_data = gatherer.gather();
                 for entry in gathered_data {
-                    tx.send(entry).unwrap(); // TODO: add proper error handling
+                    tx.send(entry)
+                        .expect("Gathered data cannot be sent to exposers");
                 }
             }
-            info!("Runloop: pull completed");
+            info!("Runloop: gathering cycle completed");
             thread::sleep(time::Duration::from_millis(pull_timeout));
         });
 
         let mut ledger = self.ledger;
         let exposers = self.exposers;
-        let publish_thread = thread::spawn(move || {
+        let exposing_thread = thread::spawn(move || {
             while let Ok(entry) = rx.recv() {
                 info!("Received metric {} = {}", entry.0, entry.1);
                 ledger.insert(entry);
                 for exposer in &exposers {
                     exposer.consume(&ledger);
                 }
-                info!("Runloop: publish completed");
+                info!("Runloop: exposing cycle completed");
                 debug!("Ledger content {}", &ledger);
             }
         });
 
         info!("Runloop started");
 
-        pull_thread.join().unwrap();
-        publish_thread.join().unwrap();
+        gathering_thread.join().unwrap();
+        exposing_thread.join().unwrap();
     }
 }

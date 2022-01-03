@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter, Result};
 
+// TODO: think about assoc types for hashmap
 pub struct PullseLedger {
     raw_data: HashMap<String, f64>,
 }
 
 impl PullseLedger {
-    pub fn new() -> PullseLedger {
+    pub fn new() -> Self {
         PullseLedger {
             raw_data: HashMap::new(),
         }

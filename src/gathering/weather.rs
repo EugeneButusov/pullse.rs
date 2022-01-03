@@ -1,8 +1,10 @@
+use super::common::{GathererInitError, PullseGatherer};
 use config::Value;
+use log::error;
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use super::common::PullseGatherer;
+static LOCAL_TEMPERATURE_KEY: &str = "LOCAL_TEMPERATURE";
 
 pub struct WeatherDataGatherer {
     api_key: String,
@@ -19,36 +21,53 @@ struct WeatherData {
     current: WeatherCondition,
 }
 
-impl WeatherDataGatherer {
-    pub fn new(settings: &HashMap<String, Value>) -> WeatherDataGatherer {
-        // TODO: think about .unwrap().clone() is good chaining
-        let api_key: String = settings
-            .get("api_key")
-            .unwrap()
-            .clone()
-            .try_into()
-            .expect("WeatherDataGatherer::new -> `api_key` should be a string.");
-        let location: String = settings
-            .get("location")
-            .unwrap()
-            .clone()
-            .try_into()
-            .expect("WeatherDataGatherer::new -> `location` should be a string.");
+impl PullseGatherer for WeatherDataGatherer {
+    fn new(settings: &HashMap<String, Value>) -> Result<Self, GathererInitError> {
+        let api_key: String = match settings.get("api_key") {
+            Some(val) => match val.clone().try_into() {
+                Ok(val) => val,
+                Err(_) => {
+                    return Err(GathererInitError::SettingBadType(
+                        String::from("api_key"),
+                        String::from(std::any::type_name::<String>()),
+                    ))
+                }
+            },
+            None => return Err(GathererInitError::SettingUndefined(String::from("api_key"))),
+        };
 
-        // TODO: may be better to use Result Error instead of panicking
+        let location: String = match settings.get("location") {
+            Some(val) => match val.clone().try_into() {
+                Ok(val) => val,
+                Err(_) => {
+                    return Err(GathererInitError::SettingBadType(
+                        String::from("location"),
+                        String::from(std::any::type_name::<String>()),
+                    ))
+                }
+            },
+            None => {
+                return Err(GathererInitError::SettingUndefined(String::from(
+                    "location",
+                )))
+            }
+        };
+
         if api_key.chars().count() == 0 {
-            panic!("WeatherDataGatherer::new -> api_key cannot be empty.");
+            return Err(GathererInitError::Other(String::from(
+                "api_key cannot be empty",
+            )));
         }
 
         if location.chars().count() == 0 {
-            panic!("WeatherDataGatherer::new -> location cannot be empty.");
+            return Err(GathererInitError::Other(String::from(
+                "location cannot be empty",
+            )));
         }
 
-        WeatherDataGatherer { api_key, location }
+        Ok(WeatherDataGatherer { api_key, location })
     }
-}
 
-impl PullseGatherer for WeatherDataGatherer {
     fn gather(&self) -> HashMap<String, f64> {
         let mut result = HashMap::new();
 
@@ -56,15 +75,26 @@ impl PullseGatherer for WeatherDataGatherer {
             "http://api.weatherapi.com/v1/current.json?key={}&q={}&aqi=no",
             self.api_key, self.location
         );
-        let resp = reqwest::blocking::get(url)
-            .unwrap()
-            .json::<WeatherData>()
-            .unwrap();
+        let weather_data: Option<WeatherData> = match reqwest::blocking::get(url) {
+            Ok(response) => match response.json::<WeatherData>() {
+                Ok(data) => Some(data),
+                Err(parse_error) => {
+                    error!("Error occurred parsing weather data: {}", parse_error);
+                    None
+                }
+            },
+            Err(reqwest_error) => {
+                error!("Error occurred during http request: {}", reqwest_error);
+                None
+            }
+        };
 
-        result.insert(
-            String::from("LOCAL_TEMPERATURE"),
-            resp.current.temp_c.into(),
-        );
+        if let Some(weather_data) = weather_data {
+            result.insert(
+                String::from(LOCAL_TEMPERATURE_KEY),
+                weather_data.current.temp_c.into(),
+            );
+        }
 
         result
     }

@@ -1,5 +1,7 @@
 use super::ledger::*;
 use crate::settings::{AgentSettings, ExposerKey};
+use common::PullseExposer;
+use log::error;
 use std::collections::HashMap;
 
 // general traits, structs, etc
@@ -16,11 +18,15 @@ pub fn get_exposers(
 
     if let Some(prometheus_settings) = settings.get("prometheus") {
         if prometheus_settings.enabled {
-            result.push(Box::new(prometheus::PrometheusExposer::new(
-                ledger,
-                &prometheus_settings.options,
-            ))
-                as Box<dyn common::PullseExposer + Send + Sync>);
+            match prometheus::PrometheusExposer::new(ledger, &prometheus_settings.options) {
+                Ok(prometheus_exposer) => {
+                    result.push(Box::new(prometheus_exposer)
+                        as Box<dyn common::PullseExposer + Send + Sync>);
+                }
+                Err(error) => {
+                    error!("Unable to instantiate WeatherDataGatherer: {}", error);
+                }
+            }
         }
     }
 
