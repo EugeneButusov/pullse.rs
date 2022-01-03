@@ -1,10 +1,11 @@
 use std::collections::HashMap;
+use log::error;
 use config::Value;
 use prometheus::{Encoder, Gauge, Opts, Registry, TextEncoder};
 use tokio::runtime::Runtime;
 use warp::Filter;
-use super::common::{PullseExposer, ExposerInitError};
 use super::PullseLedger;
+use super::common::{PullseExposer, ExposerInitError};
 
 pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
@@ -29,10 +30,13 @@ impl PullseExposer for PrometheusExposer {
             let gauge_opts = Opts::new(metric_name, metric_name);
             let gauge = match Gauge::with_opts(gauge_opts) {
                 Ok(val) => val,
-                Err(_) => return Err(ExposerInitError::Other(format!("Unable to create gauge {}", metric_name))),
+                Err(_) => return Err(ExposerInitError::Other(format!("Unable to create gauge for {}", metric_name))),
             };
 
-            registry.register(Box::new(gauge.clone())).unwrap();
+            match registry.register(Box::new(gauge.clone())) {
+                Ok(_) => {},
+                Err(_) => return Err(ExposerInitError::Other(format!("Unable to register gauge for {}", metric_name)))
+            };
             collectors.insert(String::from(metric_name), gauge);
         }
 
@@ -40,7 +44,12 @@ impl PullseExposer for PrometheusExposer {
             let mut buffer = vec![];
             let encoder = TextEncoder::new();
             let metric_families = registry.gather();
-            encoder.encode(&metric_families, &mut buffer).unwrap();
+            match encoder.encode(&metric_families, &mut buffer) {
+                Ok(_) => {},
+                Err(error) => {
+                    error!("Cannot encode Prometheus data: {:?}", error);
+                },
+            };
             String::from_utf8(buffer).unwrap()
         });
 
