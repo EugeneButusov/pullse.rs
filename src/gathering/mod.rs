@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use log::error;
+use common::PullseGatherer;
 use crate::settings::{AgentSettings, GathererKey};
 
 // general traits, structs, etc

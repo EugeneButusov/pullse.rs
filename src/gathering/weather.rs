@@ -21,9 +21,9 @@ struct WeatherData {
     current: WeatherCondition,
 }
 
-impl WeatherDataGatherer {
+impl PullseGatherer for WeatherDataGatherer {
     // TODO: implement error type for result
-    pub fn new(settings: &HashMap<String, Value>) -> Result<Self, ()> {
+    fn new(settings: &HashMap<String, Value>) -> Result<Self, ()> {
         let api_key: String = settings
             .get("api_key")
             .expect("WeatherDataGatherer::new -> `api_key` is not defined")
@@ -48,9 +48,7 @@ impl WeatherDataGatherer {
 
         Ok(WeatherDataGatherer { api_key, location })
     }
-}
 
-impl PullseGatherer for WeatherDataGatherer {
     fn gather(&self) -> HashMap<String, f64> {
         let mut result = HashMap::new();
 
