@@ -10,8 +10,9 @@ pub struct PrometheusExposer {
     collectors: HashMap<String, Gauge>,
 }
 
-impl PrometheusExposer {
-    pub fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> Self {
+impl PullseExposer for PrometheusExposer {
+    // TODO: implement error type for result
+    fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> Result<Self, ()> {
         let port: u16 = settings
             .get("port")
             .expect("PrometheusExposer::new -> `port` is not defined")
@@ -42,11 +43,9 @@ impl PrometheusExposer {
 
         rt.spawn(warp::serve(metrics_taker).run(([0, 0, 0, 0], port)));
 
-        PrometheusExposer { collectors }
+        Ok(PrometheusExposer { collectors })
     }
-}
 
-impl PullseExposer for PrometheusExposer {
     fn consume(&self, ledger: &PullseLedger) {
         for metric_name in ledger.get_metric_names() {
             if let Some(collector) = self.collectors.get(metric_name) {

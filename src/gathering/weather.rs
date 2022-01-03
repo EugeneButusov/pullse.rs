@@ -22,7 +22,8 @@ struct WeatherData {
 }
 
 impl WeatherDataGatherer {
-    pub fn new(settings: &HashMap<String, Value>) -> Self {
+    // TODO: implement error type for result
+    pub fn new(settings: &HashMap<String, Value>) -> Result<Self, ()> {
         let api_key: String = settings
             .get("api_key")
             .expect("WeatherDataGatherer::new -> `api_key` is not defined")
@@ -45,7 +46,7 @@ impl WeatherDataGatherer {
             panic!("WeatherDataGatherer::new -> location cannot be empty");
         }
 
-        WeatherDataGatherer { api_key, location }
+        Ok(WeatherDataGatherer { api_key, location })
     }
 }
 
