@@ -4,6 +4,8 @@ use std::collections::HashMap;
 
 use super::common::PullseGatherer;
 
+static LOCAL_TEMPERATURE_KEY: &str = "LOCAL_TEMPERATURE";
+
 pub struct WeatherDataGatherer {
     api_key: String,
     location: String,
@@ -61,7 +63,7 @@ impl PullseGatherer for WeatherDataGatherer {
             .unwrap();
 
         result.insert(
-            String::from("LOCAL_TEMPERATURE"),
+            String::from(LOCAL_TEMPERATURE_KEY),
             resp.current.temp_c.into(),
         );
 
