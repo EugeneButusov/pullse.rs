@@ -7,7 +7,7 @@ pub struct PullseLedger {
 }
 
 impl PullseLedger {
-    pub fn new() -> PullseLedger {
+    pub fn new() -> Self {
         PullseLedger {
             raw_data: HashMap::new(),
         }

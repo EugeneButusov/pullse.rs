@@ -11,7 +11,7 @@ pub struct PrometheusExposer {
 }
 
 impl PrometheusExposer {
-    pub fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> PrometheusExposer {
+    pub fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> Self {
         let port: u16 = settings
             .get("port")
             .expect("PrometheusExposer::new -> `port` is not defined")

@@ -20,7 +20,7 @@ struct WeatherData {
 }
 
 impl WeatherDataGatherer {
-    pub fn new(settings: &HashMap<String, Value>) -> WeatherDataGatherer {
+    pub fn new(settings: &HashMap<String, Value>) -> Self {
         let api_key: String = settings
             .get("api_key")
             .expect("WeatherDataGatherer::new -> `api_key` is not defined")
