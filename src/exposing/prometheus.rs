@@ -12,13 +12,12 @@ pub struct PrometheusExposer {
 
 impl PrometheusExposer {
     pub fn new(ledger: &PullseLedger, settings: &HashMap<String, Value>) -> PrometheusExposer {
-        // TODO: think about .unwrap().clone() is good chaining
         let port: u16 = settings
             .get("port")
-            .unwrap()
+            .expect("PrometheusExposer::new -> `port` is not defined")
             .clone()
             .try_into()
-            .expect("PrometheusExposer::new -> `port` should be a number.");
+            .expect("PrometheusExposer::new -> `port` should be a number");
 
         let registry = Registry::new();
         let mut collectors = HashMap::new();
@@ -39,7 +38,7 @@ impl PrometheusExposer {
             String::from_utf8(buffer).unwrap()
         });
 
-        let rt = Runtime::new().unwrap();
+        let rt = Runtime::new().expect("Unable to instantiate tokio runtime");
 
         rt.spawn(warp::serve(metrics_taker).run(([0, 0, 0, 0], port)));
 

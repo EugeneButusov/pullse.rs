@@ -53,7 +53,7 @@ impl App {
             for gatherer in &gatherers {
                 let gathered_data = gatherer.gather();
                 for entry in gathered_data {
-                    tx.send(entry).unwrap(); // TODO: add proper error handling
+                    tx.send(entry).expect("Gathered data cannot be sent to exposers");
                 }
             }
             info!("Runloop: pull completed");

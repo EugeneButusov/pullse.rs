@@ -21,27 +21,26 @@ struct WeatherData {
 
 impl WeatherDataGatherer {
     pub fn new(settings: &HashMap<String, Value>) -> WeatherDataGatherer {
-        // TODO: think about .unwrap().clone() is good chaining
         let api_key: String = settings
             .get("api_key")
-            .unwrap()
+            .expect("WeatherDataGatherer::new -> `api_key` is not defined")
             .clone()
             .try_into()
-            .expect("WeatherDataGatherer::new -> `api_key` should be a string.");
+            .expect("WeatherDataGatherer::new -> `api_key` should be a string");
         let location: String = settings
             .get("location")
-            .unwrap()
+            .expect("WeatherDataGatherer::new -> `location` is not defined")
             .clone()
             .try_into()
-            .expect("WeatherDataGatherer::new -> `location` should be a string.");
+            .expect("WeatherDataGatherer::new -> `location` should be a string");
 
         // TODO: may be better to use Result Error instead of panicking
         if api_key.chars().count() == 0 {
-            panic!("WeatherDataGatherer::new -> api_key cannot be empty.");
+            panic!("WeatherDataGatherer::new -> api_key cannot be empty");
         }
 
         if location.chars().count() == 0 {
-            panic!("WeatherDataGatherer::new -> location cannot be empty.");
+            panic!("WeatherDataGatherer::new -> location cannot be empty");
         }
 
         WeatherDataGatherer { api_key, location }
