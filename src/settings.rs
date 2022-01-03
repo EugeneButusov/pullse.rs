@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 const DEFAULT_CONFIG_PATH: &str = "/usr/local/share/pullse/config/default";
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct CommonSettings {
     pub pull_timeout: u64,
 }
@@ -11,13 +11,13 @@ pub struct CommonSettings {
 pub type ExposerKey = String;
 pub type GathererKey = String;
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct AgentSettings {
     pub enabled: bool,
     pub options: HashMap<String, Value>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct Settings {
     pub common: CommonSettings,
     pub gatherers: HashMap<GathererKey, AgentSettings>,

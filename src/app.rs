@@ -1,11 +1,11 @@
+use log::{debug, info};
+use std::sync::mpsc::channel;
+use std::{thread, time};
 use crate::exposing::get_exposers;
 use crate::gathering::get_gatherers;
 use crate::ledger::PullseLedger;
 use crate::settings::Settings;
 use crate::{exposing, gathering};
-use log::{debug, info};
-use std::sync::mpsc::channel;
-use std::{thread, time};
 
 pub struct App {
     settings: Box<Settings>,
