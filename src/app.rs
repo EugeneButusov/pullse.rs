@@ -44,7 +44,7 @@ impl App {
 
     pub fn run(self) {
         info!("Starting runloop...");
-        let (tx, rx) = channel();
+        let (sender, receiver) = channel();
 
         let gatherers = self.gatherers;
         let pull_timeout = self.settings.common.pull_timeout;
@@ -53,7 +53,7 @@ impl App {
             for gatherer in &gatherers {
                 let gathered_data = gatherer.gather();
                 for entry in gathered_data {
-                    tx.send(entry)
+                    sender.send(entry)
                         .expect("Gathered data cannot be sent to exposers");
                 }
             }
@@ -64,7 +64,7 @@ impl App {
         let mut ledger = self.ledger;
         let exposers = self.exposers;
         let exposing_thread = thread::spawn(move || {
-            while let Ok(entry) = rx.recv() {
+            while let Ok(entry) = receiver.recv() {
                 info!("Received metric {} = {}", entry.0, entry.1);
                 ledger.insert(entry);
                 for exposer in &exposers {
