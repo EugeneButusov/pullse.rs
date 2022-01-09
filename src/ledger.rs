@@ -55,6 +55,12 @@ mod tests {
     }
 
     #[test]
+    fn test_ledger_default() {
+        let ledger = PullseLedger::default();
+        assert_eq!(ledger.raw_data.len(), 0);
+    }
+
+    #[test]
     fn test_ledger_insert() {
         let mut ledger = PullseLedger::new();
 
@@ -80,10 +86,12 @@ mod tests {
         assert_eq!(
             metric_names
                 .iter()
-                .zip(&keys)
-                .filter(|&(a, b)| a.clone().eq(b))
+                .filter(|item| keys
+                    .iter()
+                    .find(|key| (&key).eq(item)) != None
+                )
                 .count(),
-            keys.len()
+            metric_names.len()
         );
     }
 }
