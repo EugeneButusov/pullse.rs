@@ -86,10 +86,7 @@ mod tests {
         assert_eq!(
             metric_names
                 .iter()
-                .filter(|item| keys
-                    .iter()
-                    .find(|key| (&key).eq(item)) != None
-                )
+                .filter(|item| keys.iter().find(|key| (&key).eq(item)) != None)
                 .count(),
             metric_names.len()
         );
