@@ -9,3 +9,11 @@ pullse.rs - a really simple tool to scrap some data and report it somewhere (for
 ### Docker
 
 ### Docker compose
+
+## Customizing
+
+### Adding new gatherer
+
+### Adding new exposer
+
+## Future plans
