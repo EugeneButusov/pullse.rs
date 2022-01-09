@@ -25,7 +25,11 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn new_default() -> Result<Self, ConfigError> {
+    pub fn new() -> Self {
+        Config::default().try_into().unwrap()
+    }
+
+    pub fn new_from_default_config() -> Result<Self, ConfigError> {
         let mut s = Config::default();
 
         s.merge(File::with_name(DEFAULT_CONFIG_PATH))?;
@@ -40,5 +44,11 @@ impl Settings {
         s.merge(File::with_name(custom_config_path.as_str()))?;
 
         s.try_into()
+    }
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self::new()
     }
 }
