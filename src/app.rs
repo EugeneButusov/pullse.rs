@@ -53,7 +53,8 @@ impl App {
             for gatherer in &gatherers {
                 let gathered_data = gatherer.gather();
                 for entry in gathered_data {
-                    sender_handle.send(entry)
+                    sender_handle
+                        .send(entry)
                         .expect("Gathered data cannot be sent to exposers");
                 }
             }
