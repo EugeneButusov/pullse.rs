@@ -14,7 +14,7 @@ fn main() {
     let settings = if let Ok(custom_config_path) = env::var("CONFIG_PATH") {
         Settings::new_from_custom_config(custom_config_path)
     } else {
-        Settings::new_default()
+        Settings::new_from_default_config()
     }
     .expect("Config cannot be read as it's corrupted");
 
